@@ -15,7 +15,7 @@ import com.google.javascript.jscomp.JSSourceFile;
  * 
  * @author Dieter Holzmann
  * Diese Klasse durchsucht einen im "--path" angegebenen Ordner nach JavaScript Dateien
- * und compriemrt diese mit Hilfe google closure compiler zu einer Datei 
+ * und komprimiert diese mit dem "google closure compiler" zu einer Datei.
  */
 public class JSCompiler {
 
