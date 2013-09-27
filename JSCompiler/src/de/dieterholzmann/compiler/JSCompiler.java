@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -24,29 +25,32 @@ public class JSCompiler {
 	 *            - path, out_path, r
 	 */
 	public static void main(String[] args) {
-
+		if (args.length <= 0)
+			System.err.println("Usage: java -jar jscompiler [--r] --path /path/to/js/folder [[--out_path] /path/to/out/folder]");
+		
 		for (int i = 0, l = args.length; i < l; i++) {
-
-			if (args[i].equals("--r")) {
-				recursive = true;
-			}
-
-			if (args[i].equals("--path")) {
-				path = args[i + 1];
-			}
-
-			if (args[i].equals("--out_path")) {
-				outPath = args[i + 1];
+			if(args[i].startsWith("--")) {
+				if(!(args[i+1].startsWith("--")))
+					argsList.put(args[i].substring(2, args[i].length()), args[i+1]);
 			}
 		}
 		
-		if (path != null) {
-			System.out.println("search in: " + path);
-		} else {
-			System.out.println("please select a folder");
-			System.exit(1);
+		try {
+			if(argsList.get("path") == null)
+				throw new IllegalArgumentException("Not a valid argument path, please select a folder");
+			
+		} catch (IllegalArgumentException e) {
+			System.out.println(e.getMessage());
 		}
 		
+		if(argsList.get("out_path") == null)
+			argsList.put("out_path", "");
+		
+		// @TODO recursive arg
+		if(argsList.get("--r") != null)
+			recursive = true;
+		
+		System.out.println(recursive);
 		new JSCompiler();
 
 	}
@@ -66,10 +70,11 @@ public class JSCompiler {
 			}
 		};
 
-		compile(path, filefilter);
+		compile(argsList.get("path"), filefilter);
 	}
 
 	private void compile(String path, FileFilter filter) {
+		System.out.println();
 		File c = new File(path);
 		File[] files = c.listFiles(filter);
 
@@ -91,32 +96,39 @@ public class JSCompiler {
 				}
 			}
 		}
-
-		Compiler compiler = new Compiler();
-		CompilerOptions options = new CompilerOptions();
-		compiler.compile(externalJavascriptFiles, primaryJavascriptFiles,
-				options);
-
-		for (JSError message : compiler.getWarnings()) {
-			System.err.println("Warning message: " + message.toString());
+		
+		if(externalJavascriptFiles.size() > 0 || primaryJavascriptFiles.size() > 0) {
+			Compiler compiler = new Compiler();
+			CompilerOptions options = new CompilerOptions();
+			compiler.compile(externalJavascriptFiles, primaryJavascriptFiles,
+					options);
+			
+			for (JSError message : compiler.getWarnings()) {
+				System.err.println("Warning message: " + message.toString());
+			}
+			
+			for (JSError message : compiler.getErrors()) {
+				System.err.println("Error message: " + message.toString());
+			}
+			
+			FileWriter outputFile;
+			try {
+				outputFile = new FileWriter(argsList.get("out_path") + "out.mini.js");
+				outputFile.write(compiler.toSource());
+				outputFile.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.out.println("Not found");
 		}
-
-		for (JSError message : compiler.getErrors()) {
-			System.err.println("Error message: " + message.toString());
-		}
-
-		FileWriter outputFile;
-		try {
-			outputFile = new FileWriter(outPath + "out.mini.js");
-			outputFile.write(compiler.toSource());
-			outputFile.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 	}
-
-	private static String path = null;
-	private static String outPath = "";
+	
+	
+//	private static String path = null;
+//	private static String outPath = "";
 	private static Boolean recursive = false;
+	
+	private static HashMap<String, String> argsList = new HashMap<String, String>();
 }
+
