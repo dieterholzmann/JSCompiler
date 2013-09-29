@@ -19,7 +19,7 @@ public class HTTPJSCompiler {
 	}
 
 	private void init() {
-		ArrayList<String> JSFiles = new ArrayList<String>();
+		ArrayList<String> files = new ArrayList<String>();
 		URL url = null;
 		try {
 			url = new URL(this.url);
@@ -30,13 +30,13 @@ public class HTTPJSCompiler {
 		BufferedReader in = null;
 		String ln;
 		String html = "";
-		
+
 		try {
 			in = new BufferedReader(new InputStreamReader(url.openStream()));
 
 			while ((ln = in.readLine()) != null) {
 				html += ln;
-				if(ln.indexOf("base") > 0)
+				if (ln.indexOf("base") > 0)
 					setBaseURL(ln);
 			}
 			in.close();
@@ -46,26 +46,43 @@ public class HTTPJSCompiler {
 
 		Pattern p = Pattern.compile("src=\"(.*?)\"");
 		Matcher m = p.matcher(html);
-		
-		
 
+		String filePath = null;
 		while (m.find()) {
-			if (m.group(1).indexOf(".js") > 0) {
-				JSFiles.add(m.group(1));
+			filePath = m.group(1);
+			if (filePath.indexOf(".js") > 0) {
+
+				if (!filePath.startsWith(baseURL)
+						&& (!filePath.startsWith("http")
+								&& !filePath.startsWith("www") && !filePath
+									.startsWith("//")))
+					files.add(baseURL + filePath);
+				else
+					files.add(filePath);
 			}
 		}
+
+		System.out.println("Base URL: " + baseURL);
+
+		for (String file : files) {
+			System.out.println(file);
+		}
+
 	}
-	
+
 	private void setBaseURL(String str) {
 		Pattern p = Pattern.compile("<base href=\"(.*?)\"");
 		Matcher m = p.matcher(str);
-		
+
 		while (m.find()) {
-			if(!m.group(1).equals(""))
+			if (!m.group(1).equals(""))
 				baseURL = m.group(1);
 		}
+
+		if (!baseURL.equals("") && baseURL.lastIndexOf("/") <= 0)
+			baseURL += "/";
 	}
 
-	 private String url = "";
-	 private String baseURL = null;
+	private String url = "";
+	private String baseURL = null;
 }
