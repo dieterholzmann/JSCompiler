@@ -19,10 +19,7 @@ public class HTTPJSCompiler {
 	}
 
 	private void init() {
-		// String externalJavascriptResources[] = {
-		// "http://dothot.de/script.js"
-		// };
-		ArrayList<String> files = new ArrayList<String>();
+		ArrayList<String> JSFiles = new ArrayList<String>();
 		URL url = null;
 		try {
 			url = new URL(this.url);
@@ -54,7 +51,7 @@ public class HTTPJSCompiler {
 
 		while (m.find()) {
 			if (m.group(1).indexOf(".js") > 0) {
-				files.add(m.group(1));
+				JSFiles.add(m.group(1));
 			}
 		}
 	}
