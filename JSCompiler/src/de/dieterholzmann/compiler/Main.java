@@ -34,8 +34,10 @@ public class Main {
 //		if (argsList.get("--r") != null)
 //			recursive = true;
 		
-//		new JSCompiler(argsList);
-		new HTTPJSCompiler(argsList);
+		if(argsList.get("http") != null)
+			new HTTPJSCompiler(argsList);
+		else
+			new JSCompiler(argsList);
 	}
 
 	private static HashMap<String, String> argsList = new HashMap<String, String>();
