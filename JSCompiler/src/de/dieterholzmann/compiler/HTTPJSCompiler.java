@@ -6,29 +6,56 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.javascript.jscomp.JSSourceFile;
+
 public class HTTPJSCompiler {
-	public static void main(String[] args) {
-		new HTTPJSCompiler();
+
+	public HTTPJSCompiler(HashMap<String, String> argsList) {
+		init(argsList);
 	}
 
-	public HTTPJSCompiler() {
-		init();
-	}
-
-	private void init() {
+	private void init(HashMap<String, String> argsList) {
 		ArrayList<String> files = findJSFiles();
 
-		System.out.println("Base URL: " + baseURL);
+		ArrayList<JSSourceFile> externalJavascriptFiles = new ArrayList<JSSourceFile>();
+		ArrayList<JSSourceFile> primaryJavascriptFiles = new ArrayList<JSSourceFile>();
+
+		BufferedReader br = null;
+		String ln;
 
 		for (String file : files) {
-			System.out.println(file);
+			String code = "";
+			try {
+				br = new BufferedReader(new InputStreamReader(
+						new URL(file).openStream(), "UTF-8"));
+
+				while ((ln = br.readLine()) != null) {
+					code += ln;
+				}
+				br.close();
+				// TODO check the base url for external files
+				
+				// if (file.indexOf("mini") > 0 || file.indexOf("min") > 0) {
+				// externalJavascriptFiles.add(JSSourceFile.fromCode(file,
+				// code));
+				// System.out.println("External: " + file);
+				// } else {
+				// System.out.println("Primary: " + file);
+				// }
+				primaryJavascriptFiles.add(JSSourceFile.fromCode(file, code));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
+		new MyCompiler(externalJavascriptFiles, primaryJavascriptFiles,
+				argsList);
 	}
-	
+
 	private ArrayList<String> findJSFiles() {
 		ArrayList<String> files = new ArrayList<String>();
 		URL url = null;
@@ -43,7 +70,8 @@ public class HTTPJSCompiler {
 		String html = "";
 
 		try {
-			in = new BufferedReader(new InputStreamReader(url.openStream()));
+			in = new BufferedReader(new InputStreamReader(url.openStream(),
+					"UTF-8"));
 
 			while ((ln = in.readLine()) != null) {
 				html += ln;
@@ -91,6 +119,6 @@ public class HTTPJSCompiler {
 			baseURL += "/";
 	}
 
-	private String url = "http://www.personalwerk.de";
+	private String url = "";
 	private String baseURL = null;
 }

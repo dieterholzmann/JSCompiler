@@ -29,11 +29,12 @@ public class Main {
 		if (argsList.get("out_path") == null)
 			argsList.put("out_path", "");
 
-		// @TODO recursive arg
+		// TODO recursive arg
 //		if (argsList.get("--r") != null)
 //			recursive = true;
 		
-		new JSCompiler(argsList);
+//		new JSCompiler(argsList);
+		new HTTPJSCompiler(argsList);
 	}
 
 	private static HashMap<String, String> argsList = new HashMap<String, String>();
