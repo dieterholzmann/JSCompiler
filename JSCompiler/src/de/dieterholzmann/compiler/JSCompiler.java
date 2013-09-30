@@ -20,48 +20,11 @@ import com.google.javascript.jscomp.JSSourceFile;
  */
 public class JSCompiler {
 
-	/**
-	 * @param args
-	 *            - path, out_path, r
-	 */
-	public static void main(String[] args) {
-		if (args.length <= 0)
-			System.err
-					.println("Usage: java -jar jscompiler [--r] --path /path/to/js/folder [[--out_path] /path/to/out/folder]");
-
-		for (int i = 0, l = args.length; i < l; i++) {
-			if (args[i].startsWith("--")) {
-				if (!(args[i + 1].startsWith("--")))
-					argsList.put(args[i].substring(2, args[i].length()),
-							args[i + 1]);
-			}
-		}
-
-		try {
-			if (argsList.get("path") == null)
-				throw new IllegalArgumentException(
-						"Not a valid argument path, please select a folder");
-
-		} catch (IllegalArgumentException e) {
-			System.out.println(e.getMessage());
-		}
-
-		if (argsList.get("out_path") == null)
-			argsList.put("out_path", "");
-
-		// @TODO recursive arg
-		if (argsList.get("--r") != null)
-			recursive = true;
-
-		new JSCompiler();
-
+	public JSCompiler(HashMap<String, String> argsList) {
+		init(argsList);
 	}
 
-	public JSCompiler() {
-		init();
-	}
-
-	private void init() {
+	private void init(HashMap<String, String> argsList) {
 		FileFilter filefilter = new FileFilter() {
 			public boolean accept(File file) {
 				// if the file extension is "js" return true, else false
@@ -81,14 +44,13 @@ public class JSCompiler {
 		File[] files = c.listFiles(filter);
 
 		ArrayList<JSSourceFile> primaryJavascriptFiles = new ArrayList<JSSourceFile>();
-
 		ArrayList<JSSourceFile> externalJavascriptFiles = new ArrayList<JSSourceFile>();
 
 		for (File f : files) {
 			if (f.isDirectory()) {
-				if (recursive) {
-					findJSFiles(f.getPath(), filter);
-				}
+				// if (recursive) {
+				findJSFiles(f.getPath(), filter);
+				// }
 			} else {
 				String name = f.getName();
 
@@ -107,12 +69,12 @@ public class JSCompiler {
 		if (externalJavascriptFiles.size() > 0
 				|| primaryJavascriptFiles.size() > 0) {
 
+			// compile the js files
 			new MyCompiler(externalJavascriptFiles, primaryJavascriptFiles,
 					argsList);
 		}
 	}
 
-	private static Boolean recursive = false;
-
+	// private static Boolean recursive = false;
 	private static HashMap<String, String> argsList = new HashMap<String, String>();
 }
