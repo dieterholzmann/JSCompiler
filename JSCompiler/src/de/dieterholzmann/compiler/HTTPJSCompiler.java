@@ -28,7 +28,7 @@ public class HTTPJSCompiler {
 		}
 
 	}
-
+	
 	private ArrayList<String> findJSFiles() {
 		ArrayList<String> files = new ArrayList<String>();
 		URL url = null;

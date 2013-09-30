@@ -106,28 +106,9 @@ public class JSCompiler {
 
 		if (externalJavascriptFiles.size() > 0
 				|| primaryJavascriptFiles.size() > 0) {
-			Compiler compiler = new Compiler();
-			CompilerOptions options = new CompilerOptions();
-			compiler.compile(externalJavascriptFiles, primaryJavascriptFiles,
-					options);
 
-			for (JSError message : compiler.getWarnings()) {
-				System.err.println("Warning message: " + message.toString());
-			}
-
-			for (JSError message : compiler.getErrors()) {
-				System.err.println("Error message: " + message.toString());
-			}
-
-			FileWriter outputFile;
-			try {
-				outputFile = new FileWriter(argsList.get("out_path")
-						+ "out.mini.js");
-				outputFile.write(compiler.toSource());
-				outputFile.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			new MyCompiler(externalJavascriptFiles, primaryJavascriptFiles,
+					argsList);
 		}
 	}
 
