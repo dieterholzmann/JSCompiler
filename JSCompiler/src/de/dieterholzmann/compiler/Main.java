@@ -18,13 +18,14 @@ public class Main {
 		}
 
 		try {
-			if (argsList.get("path") == null)
+			if (argsList.get("path") == null && argsList.get("http") == null)
 				throw new IllegalArgumentException(
 						"Not a valid argument path, please select a folder");
 
 		} catch (IllegalArgumentException e) {
 			System.out.println(e.getMessage());
 		}
+		
 
 		if (argsList.get("out_path") == null)
 			argsList.put("out_path", "");

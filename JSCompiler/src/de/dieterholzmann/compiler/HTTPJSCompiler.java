@@ -19,7 +19,7 @@ public class HTTPJSCompiler {
 	}
 
 	private void init(HashMap<String, String> argsList) {
-		ArrayList<String> files = findJSFiles();
+		ArrayList<String> files = findJSFiles(argsList);
 
 		ArrayList<JSSourceFile> externalJavascriptFiles = new ArrayList<JSSourceFile>();
 		ArrayList<JSSourceFile> primaryJavascriptFiles = new ArrayList<JSSourceFile>();
@@ -56,11 +56,11 @@ public class HTTPJSCompiler {
 				argsList);
 	}
 
-	private ArrayList<String> findJSFiles() {
+	private ArrayList<String> findJSFiles(HashMap<String, String> argsList) {
 		ArrayList<String> files = new ArrayList<String>();
 		URL url = null;
 		try {
-			url = new URL(this.url);
+			url = new URL(argsList.get("http"));
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
@@ -119,6 +119,5 @@ public class HTTPJSCompiler {
 			baseURL += "/";
 	}
 
-	private String url = "";
 	private String baseURL = null;
 }
