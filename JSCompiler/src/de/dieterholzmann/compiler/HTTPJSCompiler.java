@@ -19,6 +19,17 @@ public class HTTPJSCompiler {
 	}
 
 	private void init() {
+		ArrayList<String> files = findJSFiles();
+
+		System.out.println("Base URL: " + baseURL);
+
+		for (String file : files) {
+			System.out.println(file);
+		}
+
+	}
+
+	private ArrayList<String> findJSFiles() {
 		ArrayList<String> files = new ArrayList<String>();
 		URL url = null;
 		try {
@@ -55,19 +66,16 @@ public class HTTPJSCompiler {
 				if (!filePath.startsWith(baseURL)
 						&& (!filePath.startsWith("http")
 								&& !filePath.startsWith("www") && !filePath
-									.startsWith("//")))
+									.startsWith("//"))) {
+
 					files.add(baseURL + filePath);
-				else
+				} else {
 					files.add(filePath);
+				}
 			}
 		}
 
-		System.out.println("Base URL: " + baseURL);
-
-		for (String file : files) {
-			System.out.println(file);
-		}
-
+		return files;
 	}
 
 	private void setBaseURL(String str) {
@@ -83,6 +91,6 @@ public class HTTPJSCompiler {
 			baseURL += "/";
 	}
 
-	private String url = "";
+	private String url = "http://www.personalwerk.de";
 	private String baseURL = null;
 }
