@@ -24,21 +24,33 @@ public class HTTPJSCompiler {
 		ArrayList<JSSourceFile> externalJavascriptFiles = new ArrayList<JSSourceFile>();
 		ArrayList<JSSourceFile> primaryJavascriptFiles = new ArrayList<JSSourceFile>();
 
-		BufferedReader br = null;
-		String ln;
+		String protocol = getProtocol(argsList.get("http"));
 
 		for (String file : files) {
+			BufferedReader br = null;
+			String ln = null;
 			String code = "";
 			try {
 				br = new BufferedReader(new InputStreamReader(
 						new URL(file).openStream(), "UTF-8"));
 
 				while ((ln = br.readLine()) != null) {
-					code += ln;
+					code += ln + "\n";
 				}
 				br.close();
-				// TODO check the base url for external files
-				
+
+				// set protocol bei undefined protocol urls
+				if (file.startsWith("//"))
+					file = protocol + ":" + file;
+
+				// check the base url for external files
+				if (!file.startsWith(baseURL))
+					externalJavascriptFiles.add(JSSourceFile.fromCode(file,
+							code));
+				else
+					primaryJavascriptFiles.add(JSSourceFile
+							.fromCode(file, code));
+
 				// if (file.indexOf("mini") > 0 || file.indexOf("min") > 0) {
 				// externalJavascriptFiles.add(JSSourceFile.fromCode(file,
 				// code));
@@ -46,7 +58,6 @@ public class HTTPJSCompiler {
 				// } else {
 				// System.out.println("Primary: " + file);
 				// }
-				primaryJavascriptFiles.add(JSSourceFile.fromCode(file, code));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -106,6 +117,12 @@ public class HTTPJSCompiler {
 		return files;
 	}
 
+	/**
+	 * Set base url
+	 * 
+	 * @param str
+	 *            - html quellcode
+	 */
 	private void setBaseURL(String str) {
 		Pattern p = Pattern.compile("<base href=\"(.*?)\"");
 		Matcher m = p.matcher(str);
@@ -117,6 +134,21 @@ public class HTTPJSCompiler {
 
 		if (!baseURL.equals("") && baseURL.lastIndexOf("/") <= 0)
 			baseURL += "/";
+	}
+
+	/**
+	 * Get the protocol from url
+	 * 
+	 * @param str
+	 *            - page url
+	 * @return protocol as String (http/https)
+	 */
+	private String getProtocol(String str) {
+		if (str != null && !str.equals("")) {
+			if (str.startsWith("http"))
+				return str.substring(0, str.indexOf("://"));
+		}
+		return "http";
 	}
 
 	private String baseURL = null;
